@@ -5,6 +5,7 @@ An AI-powered invoice processing system that extracts structured data from invoi
 ## Features
 
 - 🤖 **AI-Powered Extraction**: Uses Claude AI to extract comprehensive invoice data
+- 🌏 **Traditional Chinese Support**: Optimized for Traditional Chinese invoices and text
 - 📊 **Excel Export**: Generates structured Excel files with all invoice details
 - 💰 **Payment Tracking**: Manage payment status and due dates
 - 🔍 **Data Filtering**: Filter and export specific invoice data
