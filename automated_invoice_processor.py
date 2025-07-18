@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from base64 import b64encode
 from anthropic import Anthropic
 import pandas as pd
+from excel_manager import ExcelManager
 
 EXTENSION_TO_MEDIA_TYPE = {
     "jpg": "image/jpeg",
@@ -72,6 +73,9 @@ class InvoiceProcessor:
         self.output_file = os.path.join(script_dir, output_file)
         self.client = None
         self.processed_data = []
+        
+        # Initialize Excel manager
+        self.excel_manager = ExcelManager(self.output_file)
         
     def initialize_api(self):
         """Initialize Anthropic API client"""
@@ -168,15 +172,11 @@ class InvoiceProcessor:
             else:
                 print(f"✗ Failed to process: {os.path.basename(image_file)}")
     
-    def export_to_excel(self):
-        """Export processed data to Excel, appending to existing file if it exists"""
-        if not self.processed_data:
-            print("No data to export")
-            return
-            
-        # Flatten data for Excel export
+    def flatten_invoice_data(self, invoice_data_list):
+        """Flatten invoice data for Excel export"""
         excel_data = []
-        for invoice in self.processed_data:
+        
+        for invoice in invoice_data_list:
             base_row = {
                 "Invoice Number": invoice.get("invoice_number", ""),
                 "Vendor Name": invoice.get("vendor_name", ""),
@@ -213,38 +213,24 @@ class InvoiceProcessor:
                     excel_data.append(row)
             else:
                 excel_data.append(base_row)
-        
-        # Create DataFrame with new data
-        new_df = pd.DataFrame(excel_data)
-        
-        # Check if Excel file already exists
-        if os.path.exists(self.output_file):
-            try:
-                # Read existing data
-                existing_df = pd.read_excel(self.output_file)
                 
-                # Get existing invoice numbers to avoid duplicates
-                existing_invoice_numbers = set(existing_df["Invoice Number"].dropna().astype(str))
-                
-                # Filter out duplicates from new data
-                new_df_filtered = new_df[~new_df["Invoice Number"].astype(str).isin(existing_invoice_numbers)]
-                
-                if len(new_df_filtered) > 0:
-                    # Append new data to existing data
-                    combined_df = pd.concat([existing_df, new_df_filtered], ignore_index=True)
-                    combined_df.to_excel(self.output_file, index=False)
-                    print(f"✓ Added {len(new_df_filtered)} new invoices to existing file: {self.output_file}")
-                else:
-                    print("No new invoices to add (all invoices already exist in the file)")
-                    
-            except Exception as e:
-                print(f"Error reading existing file, creating new one: {e}")
-                new_df.to_excel(self.output_file, index=False)
-                print(f"✓ Data exported to new file: {self.output_file}")
-        else:
-            # Create new file
-            new_df.to_excel(self.output_file, index=False)
-            print(f"✓ Data exported to new file: {self.output_file}")
+        return excel_data
+
+    def export_to_excel(self, append_mode=True):
+        """Export processed data to Excel using ExcelManager"""
+        return self.excel_manager.export_to_excel(self.processed_data, append_mode)
+    
+    def read_excel_data(self):
+        """Read existing Excel data using ExcelManager"""
+        return self.excel_manager.read_excel_data()
+    
+    def update_payment_status(self, invoice_number, payment_status, payment_date=None):
+        """Update payment status using ExcelManager"""
+        return self.excel_manager.update_payment_status(invoice_number, payment_status, payment_date)
+    
+    def get_invoice_summary(self):
+        """Get invoice summary using ExcelManager"""
+        return self.excel_manager.get_invoice_summary()
     
     def run(self):
         """Run the complete invoice processing workflow"""
