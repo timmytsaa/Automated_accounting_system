@@ -13,7 +13,15 @@ An AI-powered invoice processing system that extracts structured data from invoi
 
 ## Quick Start
 
-### 1. Installation
+### For Windows Users (Recommended)
+
+1. **Download and extract the project files**
+2. **Double-click `setup_windows.bat`** to install everything automatically
+3. **Edit the `.env` file** and add your Anthropic API key
+4. **Add invoice images** to the `invoice` folder
+5. **Double-click `run_processor.bat`** to process invoices
+
+### For Linux/Mac Users
 
 ```bash
 # Clone the repository
@@ -22,25 +30,17 @@ cd invoice-processing-system
 
 # Create virtual environment
 python3 -m venv venv_new
-source venv_new/bin/activate  # On Windows: venv_new\Scripts\activate
+source venv_new/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Configuration
-
-```bash
 # Copy environment file
 cp .env.example .env
 
 # Edit .env file and add your Anthropic API key
 # Get your API key from: https://console.anthropic.com/
-```
 
-### 3. Usage
-
-```bash
 # Add invoice images to the invoice folder
 cp your_invoices/*.jpg invoice/
 
